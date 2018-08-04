@@ -5,8 +5,6 @@ import App from './App';
 import Images from './Images';
 import Tags from './Tags';
 import Category from './Category';
-import Scroll from './Scroll';
-
 import { AppContainer } from 'react-hot-loader';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Post from './Post';
