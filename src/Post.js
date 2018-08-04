@@ -32,7 +32,7 @@ class Post extends React.Component {
 
   render() {
     return (
-    	<div>aaa
+    	<div>
             <img key={this.state.image} src={(`https://i.imgur.com/${this.state.image}.jpg`)} />
   
 		    <ul>

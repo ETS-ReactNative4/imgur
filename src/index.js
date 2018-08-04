@@ -21,9 +21,7 @@ const renderApp = (App) => {
                         <Route exact path='/' component={Images} />
                         <Route exact path='/category' component={Category} />
                         <Route exact path='/post' component={Post} />
-                        <Route exact path='/scroll' component={Scroll} />
-
-                  
+                        
                     </Switch>
                 </App>
             </BrowserRouter>
