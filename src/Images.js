@@ -1,18 +1,21 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
-
 const style = {
-  height: 400,
-  width: 400
+  height: 700,
+  width: 700
 };
 
+let strGET = (window.location.search.replace( '?', '')),
+    tag = strGET.substr(4);
+console.log(strGET);
+let urlTag = "https://api.imgur.com/3/gallery/t/" + tag;
+let url = "https://api.imgur.com/3/gallery/hot/viral/ + this.state.page + .json";
+
 class Images extends React.Component {
+
   state = {
     imageId: [],
     add: [],
@@ -20,18 +23,29 @@ class Images extends React.Component {
   }
 
   componentDidMount() {
-    axios.get('https://api.imgur.com/3/gallery/hot/viral/0.json')
-      .then(res => {
+    if (tag) {
+      url = urlTag;
+    } 
+    console.log(url);
+    axios({
+      method: 'get',
+      url: url,
+      headers: { 'authorization': 'Client-ID 89929a98873902c' }
+    }).then(res => {
         let image = res.data.data;
+        if (tag) {
+          image = res.data.data.items;
+        } 
         let imageId = new Array;
-        for (var i = 0; i < image.length; i++) {
+        for (let i = 0; i < image.length; i++) {
           if (image[i].cover == undefined) {
             let imag = (image[i].id);
             imageId.push(imag);
           } 
         }
+        console.log(res);
 
-        for (var i = 0; i < image.length; i++) {
+        for (let i = 0; i < image.length; i++) {
           if (image[i].cover != undefined) {
             let imag = (image[i].cover);
             imageId.push(imag);
@@ -42,9 +56,24 @@ class Images extends React.Component {
   }
 
   fetchMoreData = () => {
-    axios.get('https://api.imgur.com/3/gallery/hot/viral/' + this.state.page + '.json')
-      .then(res => {
+    if (this.state.page == 0) {
+      this.setState({page: 1});
+    }
+    url = 'https://api.imgur.com/3/gallery/hot/viral/' + this.state.page + '.json';
+    if (tag) {
+      url = 'https://api.imgur.com/3/gallery/t/' + tag + '/viral/' + this.state.page;
+    }
+    console.log(url);
+
+    axios({
+      method: 'get',
+      url: url,
+      headers: { 'authorization': 'Client-ID 89929a98873902c' }
+    }).then(res => {
         let image = res.data.data;
+        if (tag) {
+          image = res.data.data.items;
+        }
         let add = new Array;
         console.log(image);
         for (var i = 0; i < image.length; i++) {
@@ -55,7 +84,7 @@ class Images extends React.Component {
         }
 
         for (var i = 0; i < image.length; i++) {
-          if (image[i].cover != undefined) {
+          if (image[i].cover !== undefined) {
             let imag = (image[i].cover);
             add.push(imag);
           } 
@@ -75,12 +104,12 @@ class Images extends React.Component {
 
   render() {
     return (
-        <InfiniteScroll
-          dataLength={this.state.imageId.length}
-          next={this.fetchMoreData}
-          hasMore={true}
-          loader={<h4>Loading...</h4>}
-        >
+      <InfiniteScroll
+        dataLength={this.state.imageId.length}
+        next={this.fetchMoreData}
+        hasMore={true}
+        loader={<h4>Loading...</h4>}
+      >
   
       <ul>
         { this.state.imageId.map(image =>

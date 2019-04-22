@@ -1,31 +1,31 @@
-import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import logo from './logo.svg';
+import React from 'react';
 import './App.css';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
 let strGET = (window.location.search.replace( '?', '')),
     tag = strGET.substr(4);
 
-
+const style = {
+  height: 500,
+  width: 500
+};
 
 class Category extends React.Component {
   state = {
     imageId: [],
     comments: [],
-    add: []
+    add: [],
+    page: 0
   }
-
 
   componentDidMount() {
 
   	axios({
-	  method:'get',
-	  url: ('https://api.imgur.com/3/gallery/t/' + tag)
-	})
-      .then(res => {
+  	  method:'get',
+  	  url: ('https://api.imgur.com/3/gallery/t/' + tag),
+      headers: { 'authorization': 'Client-ID 89929a98873902c' }
+  	}).then(res => {
         let image = res.data.data.items;
         console.log(res);
         let imageId = new Array;
@@ -48,8 +48,14 @@ class Category extends React.Component {
   }
 
   fetchMoreData = () => {
- axios.get('https://api.imgur.com/3/gallery/hot/viral/1.json')
-      .then(res => {
+    if (this.state.page == 0) {
+      this.setState({page: 1});
+    }
+    axios({
+      method:'get',
+      url: 'https://api.imgur.com/3/gallery/t/' + tag + '/viral/' + this.state.page,
+      headers: { 'authorization': 'Client-ID 89929a98873902c' }
+    }).then(res => {
         let image = res.data.data.items;
         let add = new Array;
         console.log(image);
@@ -70,10 +76,10 @@ class Category extends React.Component {
         this.setState({ add });
       })
 
-
     setTimeout(() => {
       this.setState({
-        imageId: this.state.imageId.concat(this.state.add)
+        imageId: this.state.imageId.concat(this.state.add),
+        page: this.state.page + 1,
       });
     }, 1500);
   };
@@ -89,7 +95,7 @@ class Category extends React.Component {
   
       <ul>
         { this.state.imageId.map(image =>
-         <li><a href={`/post?id=${image}`}><img key={image} src={(`https://i.imgur.com/${image}_d.jpg`)} /></a></li>)}
+         <li><a href={`/post?id=${image}`}><img key={image} style={style} src={(`https://i.imgur.com/${image}_d.jpg`)} /></a></li>)}
           
       </ul>
       </InfiniteScroll>
